@@ -41,7 +41,7 @@ public class WeaverModel {
         this.targetWord = words[1];
         currentPath.clear();
         currentPath.add(initialWord);
-        notifyUpdate();
+        //notifyUpdate();
     }
 
 //    public ValidationResult submitWord(String word) {
