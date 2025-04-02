@@ -1,3 +1,4 @@
+import exceptions.WordGenerationException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,7 +13,7 @@ public class RandomWordStrategy implements WordGenerationStrategy{
     @Override
     public String[] generateWords(ArrayList<String> dictionary) {
         if (this.dictionary.size() < 2) {
-            throw new IllegalArgumentException("Insufficient valid words");
+            throw new WordGenerationException("Insufficient valid words");
         }
         Random random = new Random();
         int index1 = random.nextInt(dictionary.size());

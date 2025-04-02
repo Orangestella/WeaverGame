@@ -9,12 +9,15 @@ public class WeaverModel {
     private ArrayList<String> currentPath;
     private String initialWord;
     private String targetWord;
+    private StrategyFactory strategyFactory;
+    private WordGenerationStrategy wordGenerationStrategy;
+
     private boolean showErrorsFlag;
     private boolean showPathFlag;
     private boolean randomWordFlag;
 
 //    private WordValidator validator;
-    private WordGenerationStrategy strategy;
+
 
 //    public WeaverModel() throws IOException {
 //        loadDictionary();
@@ -68,8 +71,12 @@ public class WeaverModel {
 //        notifyObservers(new GameEvent(GameEvent.Type.UPDATE));
 //    }
 //
-//    // Getters and setters
-//    public void updateStrategy() {
-//        this.strategy = StrategyFactory.createStrategy(randomWords, "COLD", "WARM");
-//    }
+    // Getters and setters
+    public void updateStrategy() {
+        StrategyFactory factory = randomWordFlag ?
+                new RandomStrategyFactory() :
+                new FixedStrategyFactory("MILE", "PARK");
+
+        this.wordGenerationStrategy = factory.createStrategy(dictionary);
+    }
 }
