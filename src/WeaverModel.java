@@ -39,7 +39,7 @@ public class WeaverModel {
     }
 
     public void newGame() {
-        String[] words = strategy.generateWords(dictionary);
+        String[] words = wordGenerationStrategy.generateWords(dictionary);
         this.initialWord = words[0];
         this.targetWord = words[1];
         currentPath.clear();

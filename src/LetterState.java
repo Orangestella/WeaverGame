@@ -1,0 +1,3 @@
+public enum LetterState {
+    CORRECT_POSITION, WRONG_POSITION, NOT_IN_WORD, DEFAULT;
+}

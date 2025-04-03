@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f4f2814c-7556-48ba-b8c2-d87c79fc23b1" name="Changes" comment="real initial code">
-      <change afterPath="$PROJECT_DIR$/src/FixedStrategyFactory.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/exceptions/ConfigurationException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/exceptions/WordGameException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/exceptions/WordGenerationException.java" afterDir="false" />
+    <list default="true" id="f4f2814c-7556-48ba-b8c2-d87c79fc23b1" name="Changes" comment="add strategy factory">
+      <change afterPath="$PROJECT_DIR$/src/LetterState.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/ValidationResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/WordValidator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RandomWordStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RandomWordStrategy.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WeaverModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WeaverModel.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -21,7 +19,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Interface" />
         <option value="Class" />
+        <option value="Enum" />
       </list>
     </option>
   </component>
@@ -68,7 +68,9 @@
       <option name="presentableId" value="Default" />
       <updated>1743510770794</updated>
       <workItem from="1743510771839" duration="7808000" />
-      <workItem from="1743603195268" duration="2566000" />
+      <workItem from="1743603195268" duration="3040000" />
+      <workItem from="1743669148863" duration="48000" />
+      <workItem from="1743687870973" duration="902000" />
     </task>
     <task id="LOCAL-00001" summary="initial code">
       <option name="closed" value="true" />
@@ -86,7 +88,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743520112765</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="add strategy factory">
+      <option name="closed" value="true" />
+      <created>1743609573357</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1743609573357</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -106,7 +116,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial code" />
     <MESSAGE value="real initial code" />
-    <option name="LAST_COMMIT_MESSAGE" value="real initial code" />
+    <MESSAGE value="add strategy factory" />
+    <option name="LAST_COMMIT_MESSAGE" value="add strategy factory" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
