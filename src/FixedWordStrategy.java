@@ -16,4 +16,9 @@ public class FixedWordStrategy implements WordGenerationStrategy{
     public String[] generateWords(ArrayList<String> dictionary) {
         return new String[]{initial, target};
     }
+
+    @Override
+    public ArrayList<String> getPath() {
+        return null;
+    }
 }

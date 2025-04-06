@@ -15,6 +15,8 @@ public class RandomWordStrategy implements WordGenerationStrategy{
         if (this.dictionary.size() < 2) {
             throw new WordGenerationException("Insufficient valid words");
         }
+        String initialWord;
+        String finalWord;
         Random random = new Random();
         int index1 = random.nextInt(dictionary.size());
         int index2;
@@ -22,6 +24,14 @@ public class RandomWordStrategy implements WordGenerationStrategy{
         do {
             index2 = random.nextInt(dictionary.size());
         } while (index1 == index2);
-        return new String[]{dictionary.get(index1), dictionary.get(index2)};
+        initialWord = dictionary.get(index1);
+        finalWord = dictionary.get(index2);
+
+        return new String[]{initialWord, finalWord};
+    }
+
+    @Override
+    public ArrayList<String> getPath() {
+        return null;
     }
 }

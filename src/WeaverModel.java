@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Observable;
 
-public class WeaverModel {
+public class WeaverModel extends Observable {
     private ArrayList<String> dictionary;
     private ArrayList<String> currentPath;
     private ArrayList<ValidationResult> resultsPath;
@@ -14,6 +15,7 @@ public class WeaverModel {
     private String targetWord;
     private StrategyFactory strategyFactory;
     private WordGenerationStrategy wordGenerationStrategy;
+    private boolean isWon;
 
     private boolean showErrorsFlag;
     private boolean showPathFlag;
@@ -24,9 +26,7 @@ public class WeaverModel {
 
     public WeaverModel() throws IOException {
         loadDictionary();
-        this.validator = showErrorsFlag
-                ? new WithWarning(new BasicValidator())
-                : new BasicValidator();
+        updateValidator();
         updateStrategy();
     }
 
@@ -47,33 +47,34 @@ public class WeaverModel {
         String[] words = wordGenerationStrategy.generateWords(dictionary);
         this.initialWord = words[0];
         this.targetWord = words[1];
+        this.isWon = false;
         currentPath.clear();
-        currentPath.add(initialWord);
-        //notifyUpdate();
+        if (showPathFlag) {
+            currentPath = wordGenerationStrategy.getPath();
+        }else
+            currentPath.add(initialWord);
+        notifyUpdate();
     }
 
-    public void submitWord(String word) {
+    public void tick(String word) {
+        updateStrategy();
+        updateValidator();
         word = word.toUpperCase();
         try {
             ValidationResult result = validator.validate(word, this.targetWord, this.dictionary);
             currentPath.add(word);
             resultsPath.add(result);
+            this.isWon = resultsPath.get(resultsPath.size() - 1).getValid();
         } catch (InvalidWordException e){
             System.err.println(e.getMessage());
         }
     }
 
-    private void checkWinCondition() {
-        if (currentPath.get(currentPath.size()-1).equals(targetWord)) {
-//            setChanged();
-//            notifyObservers(new GameEvent(GameEvent.Type.WIN));
-        }
+
+    private void notifyUpdate() {
+        setChanged();
+        notifyObservers(new GameState(this.currentPath, this.resultsPath));
     }
-//
-//    private void notifyUpdate() {
-//        setChanged();
-//        notifyObservers(new GameEvent(GameEvent.Type.UPDATE));
-//    }
 //
     // Getters and setters
     public void updateStrategy() {
@@ -81,6 +82,16 @@ public class WeaverModel {
                 new RandomStrategyFactory() :
                 new FixedStrategyFactory("MILE", "PARK");
 
-        this.wordGenerationStrategy = factory.createStrategy(dictionary);
+        this.wordGenerationStrategy = showPathFlag ?
+                new WithPath(factory.createStrategy(dictionary)):
+                factory.createStrategy(dictionary);
+
     }
+
+    public void updateValidator() {
+        this.validator = showErrorsFlag
+                ? new WithWarning(new BasicValidator())
+                : new BasicValidator();
+    }
+
 }

@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public abstract class ValidatorDecorator implements WordValidator{
-    private WordValidator baseValidator;
+    private final WordValidator baseValidator;
     public ValidatorDecorator(WordValidator baseValidator) {
         this.baseValidator = baseValidator;
     }

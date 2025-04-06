@@ -5,9 +5,9 @@ public class GameState {
     private final boolean won;
     private final ArrayList<ValidationResult> results;
 
-    public GameState(boolean won, ArrayList<String> path, ArrayList<ValidationResult> results) {
+    public GameState(ArrayList<String> path, ArrayList<ValidationResult> results) {
         this.path = path;
-        this.won = won;
+        this.won = results.get(results.size() - 1).getValid();
         this.results = results;
     }
     public ArrayList<String> getPath() {
