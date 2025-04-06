@@ -1,3 +1,5 @@
+import exceptions.InvalidWordException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,6 +9,7 @@ import java.util.Objects;
 public class WeaverModel {
     private ArrayList<String> dictionary;
     private ArrayList<String> currentPath;
+    private ArrayList<ValidationResult> resultsPath;
     private String initialWord;
     private String targetWord;
     private StrategyFactory strategyFactory;
@@ -16,14 +19,16 @@ public class WeaverModel {
     private boolean showPathFlag;
     private boolean randomWordFlag;
 
-//    private WordValidator validator;
+    private WordValidator validator;
 
 
-//    public WeaverModel() throws IOException {
-//        loadDictionary();
-//        this.validator = new StrictValidator(new BasicValidator(), this);
-//        updateStrategy();
-//    }
+    public WeaverModel() throws IOException {
+        loadDictionary();
+        this.validator = showErrorsFlag
+                ? new WithWarning(new BasicValidator())
+                : new BasicValidator();
+        updateStrategy();
+    }
 
     private void loadDictionary() throws IOException {
         dictionary = new ArrayList<>();
@@ -47,24 +52,23 @@ public class WeaverModel {
         //notifyUpdate();
     }
 
-//    public ValidationResult submitWord(String word) {
-//        word = word.toUpperCase();
-//        ValidationResult result = validator.validate(word);
-//
-//        if (result.isValid()) {
-//            currentPath.add(word);
-//            checkWinCondition();
-//            notifyUpdate();
-//        }
-//        return result;
-//    }
-//
-//    private void checkWinCondition() {
-//        if (currentPath.get(currentPath.size()-1).equals(targetWord)) {
+    public void submitWord(String word) {
+        word = word.toUpperCase();
+        try {
+            ValidationResult result = validator.validate(word, this.targetWord, this.dictionary);
+            currentPath.add(word);
+            resultsPath.add(result);
+        } catch (InvalidWordException e){
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private void checkWinCondition() {
+        if (currentPath.get(currentPath.size()-1).equals(targetWord)) {
 //            setChanged();
 //            notifyObservers(new GameEvent(GameEvent.Type.WIN));
-//        }
-//    }
+        }
+    }
 //
 //    private void notifyUpdate() {
 //        setChanged();
