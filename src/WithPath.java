@@ -10,17 +10,20 @@ public class WithPath extends  WordGenerationStrategyDecorator{
 
     @Override
     public String[] generateWords(ArrayList<String> dictionary) {
-        int maxAttempt = 50;
+        int maxAttempt = 20;
         for (int i = 0; i < maxAttempt; i++) {
             String[] wordsPair = this.getBaseStrategy().generateWords(dictionary);
             this.path = PathFinder.findPathByBFS(wordsPair[0], wordsPair[1], dictionary);
-            if (!path.isEmpty())
+            if (!path.isEmpty()){
                 return wordsPair;
+            }
         }
         throw new WordGenerationException("No path found");
     }
 
     public ArrayList<String> getPath() {
-        return path;
+        return new ArrayList<> (path);
     }
+
+
 }

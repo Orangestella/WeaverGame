@@ -34,4 +34,5 @@ public class RandomWordStrategy implements WordGenerationStrategy{
     public ArrayList<String> getPath() {
         return null;
     }
+
 }

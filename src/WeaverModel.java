@@ -43,44 +43,61 @@ public class WeaverModel extends Observable {
         }
     }
 
-    public void newGame() {
+    public void initialize() {
+        updateStrategy();
+        updateValidator();
         String[] words = wordGenerationStrategy.generateWords(dictionary);
         this.initialWord = words[0];
         this.targetWord = words[1];
         this.isWon = false;
         currentPath.clear();
-        if (showPathFlag) {
-            currentPath = wordGenerationStrategy.getPath();
-        }else
-            currentPath.add(initialWord);
+        currentPath.add(initialWord);
         notifyUpdate();
     }
 
     public void tick(String word) {
         updateStrategy();
         updateValidator();
-        word = word.toUpperCase();
-        try {
-            ValidationResult result = validator.validate(word, this.targetWord, this.dictionary);
-            currentPath.add(word);
-            resultsPath.add(result);
-            this.isWon = resultsPath.get(resultsPath.size() - 1).getValid();
-        } catch (InvalidWordException e){
-            System.err.println(e.getMessage());
+        if(showPathFlag)
+            notifyFullPathUpdate();
+        else {
+            word = word.toUpperCase();
+            try {
+                ValidationResult result = validator.validate(word, this.targetWord, this.dictionary);
+                currentPath.add(word);
+                resultsPath.add(result);
+                this.isWon = resultsPath.get(resultsPath.size() - 1).getValid();
+                notifyUpdate();
+            } catch (InvalidWordException e) {
+                System.err.println(e.getMessage());
+            }
         }
     }
 
 
     private void notifyUpdate() {
         setChanged();
-        notifyObservers(new GameState(this.currentPath, this.resultsPath));
+        notifyObservers(new GameState(this.initialWord, this.targetWord, this.currentPath, this.resultsPath));
+    }
+
+    private void notifyFullPathUpdate(){
+        setChanged();
+        ArrayList<String> fullPath = this.wordGenerationStrategy.getPath();
+        try {
+            if (fullPath == null)
+                notifyObservers(PathFinder.completePath(this.initialWord, this.targetWord, this.dictionary, this.validator));
+            else
+                notifyObservers(new GameState(this.initialWord, this.targetWord, fullPath, PathFinder.getValidations(this.targetWord, fullPath, this.dictionary, this.validator)));
+        }catch (RuntimeException e){
+            System.err.println(e.getMessage());
+        }
     }
 //
     // Getters and setters
     public void updateStrategy() {
         StrategyFactory factory = randomWordFlag ?
                 new RandomStrategyFactory() :
-                new FixedStrategyFactory("MILE", "PARK");
+                new FixedStrategyFactory(this.dictionary.get(1), this.dictionary.get(0));
 
         this.wordGenerationStrategy = showPathFlag ?
                 new WithPath(factory.createStrategy(dictionary)):

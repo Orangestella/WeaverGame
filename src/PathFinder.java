@@ -33,7 +33,6 @@ public class PathFinder {
             ArrayList<String> currentPath = queue.poll();
             String currentWord = currentPath.get(currentPath.size() - 1);
 
-            // 生成所有可能的模式并查找邻居
             for (int i = 0; i < currentWord.length(); i++) {
                 String pattern = currentWord.substring(0, i) + '*' + currentWord.substring(i + 1);
                 List<String> neighbors = patternMap.getOrDefault(pattern, new ArrayList<>());
@@ -53,4 +52,20 @@ public class PathFinder {
 
         return new ArrayList<>();
     }
+
+    public static ArrayList<ValidationResult> getValidations(String target, ArrayList<String> path, ArrayList<String> dictionary, WordValidator validator) {
+        ArrayList<ValidationResult> validationResults = new ArrayList<>();
+        if (path.isEmpty())
+            throw new RuntimeException("Path not found");
+        for (String word : path)
+            validationResults.add(validator.validate(word, target, dictionary));
+        return validationResults;
+    }
+
+    public static GameState completePath(String initial, String target, ArrayList<String> dictionary, WordValidator validator) {
+        ArrayList<String> path = findPathByBFS(initial, target, dictionary);
+        ArrayList<ValidationResult> validationResults = getValidations(target, path, dictionary, validator);
+        return new GameState(initial, target, path, validationResults);
+    }
+
 }

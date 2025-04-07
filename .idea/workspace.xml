@@ -4,16 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f4f2814c-7556-48ba-b8c2-d87c79fc23b1" name="Changes" comment="update game state">
-      <change afterPath="$PROJECT_DIR$/src/PathFinder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/WithPath.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/WordGenerationStrategyDecorator.java" afterDir="false" />
+    <list default="true" id="f4f2814c-7556-48ba-b8c2-d87c79fc23b1" name="Changes" comment="update path finding">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/FixedWordStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FixedWordStrategy.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GameState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameState.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PathFinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PathFinder.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/RandomWordStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RandomWordStrategy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ValidatorDecorator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ValidatorDecorator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WeaverModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WeaverModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/WithPath.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WithPath.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/WithWarning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WithWarning.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WordGenerationStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WordGenerationStrategy.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -82,7 +81,10 @@
       <workItem from="1743687870973" duration="2325000" />
       <workItem from="1743854673660" duration="7618000" />
       <workItem from="1743901226106" duration="6030000" />
-      <workItem from="1743935547376" duration="7306000" />
+      <workItem from="1743935547376" duration="7602000" />
+      <workItem from="1743993140735" duration="4271000" />
+      <workItem from="1744008171279" duration="4326000" />
+      <workItem from="1744015820197" duration="3646000" />
     </task>
     <task id="LOCAL-00001" summary="initial code">
       <option name="closed" value="true" />
@@ -132,7 +134,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743906722311</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="update path finding">
+      <option name="closed" value="true" />
+      <created>1743953448304</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1743953448304</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -162,7 +172,8 @@
     <MESSAGE value="add validation" />
     <MESSAGE value="update validator" />
     <MESSAGE value="update game state" />
-    <option name="LAST_COMMIT_MESSAGE" value="update game state" />
+    <MESSAGE value="update path finding" />
+    <option name="LAST_COMMIT_MESSAGE" value="update path finding" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

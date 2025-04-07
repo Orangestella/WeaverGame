@@ -8,8 +8,10 @@ public class WithWarning extends ValidatorDecorator{
     @Override
     public ValidationResult validate(String word, String target, ArrayList<String> dictionary) {
         ValidationResult result = this.getBaseValidator().validate(word, target, dictionary);
-        if (result.getValid())
+        if (!result.getValid())
             result.setMessage("Your answer is incorrect, please try again.");
+        else
+            result.setMessage("You win the game!");
         return result;
     }
 }

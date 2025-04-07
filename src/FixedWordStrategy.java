@@ -21,4 +21,5 @@ public class FixedWordStrategy implements WordGenerationStrategy{
     public ArrayList<String> getPath() {
         return null;
     }
+
 }
