@@ -9,7 +9,7 @@ public class WithWarning extends ValidatorDecorator{
     public ValidationResult validate(String word, String target, ArrayList<String> dictionary) {
         ValidationResult result = this.getBaseValidator().validate(word, target, dictionary);
         if (!result.getValid())
-            result.setMessage("Your answer is incorrect, please try again.");
+            result.setMessage("Continue");
         else
             result.setMessage("You win the game!");
         return result;

@@ -41,7 +41,7 @@ public class ValidationResult {
     }
 
     public ValidationResult(Map<Integer, LetterState> letterStates){
-        this.message = "NULL";
+        this.message = "   ";
         this.letterStates = letterStates;
         this.valid = isValid();
     }

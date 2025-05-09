@@ -1,14 +1,4 @@
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.Observable;
-import java.util.Observer; // Although Controller doesn't observe, adding for completeness if needed later
 
-// Ensure these classes are in the correct package or imported correctly
-// import your_package_name.WeaverModel;
-// import your_package_name.GUIView;
 
 public class GUIController {
 
@@ -110,38 +100,36 @@ public class GUIController {
         view.requestFocusInWindow();
     }
 
-    /**
-     * Gets a KeyListener for handling physical keyboard input.
-     * @return The KeyListener instance.
-     */
-    public KeyListener getKeyListener() {
-        return new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                int keyCode = e.getKeyCode();
-                if (keyCode == KeyEvent.VK_ENTER) {
-                    processEnterKey();
-                } else if (keyCode == KeyEvent.VK_BACK_SPACE) {
-                    processBackspaceKey();
-                } else if (keyCode >= KeyEvent.VK_A && keyCode <= KeyEvent.VK_Z) {
-                    processLetterKey(e.getKeyChar());
-                }
-                // Request focus back to the frame after processing key press
-                view.requestFocusInWindow();
-            }
-        };
-    }
+//    /**
+//     * Gets a KeyListener for handling physical keyboard input.
+//     * @return The KeyListener instance.
+//     */
+//    public KeyListener getKeyListener() {
+//        return new KeyAdapter() {
+//            @Override
+//            public void keyPressed(KeyEvent e) {
+//                int keyCode = e.getKeyCode();
+//                if (keyCode == KeyEvent.VK_ENTER) {
+//                    processEnterKey();
+//                } else if (keyCode == KeyEvent.VK_BACK_SPACE) {
+//                    processBackspaceKey();
+//                } else if (keyCode >= KeyEvent.VK_A && keyCode <= KeyEvent.VK_Z) {
+//                    processLetterKey(e.getKeyChar());
+//                }
+//                // Request focus back to the frame after processing key press
+//                view.requestFocusInWindow();
+//            }
+//        };
+//    }
 
     /**
-     * Processes a letter key press (physical or virtual).
+     * Processes a letter key press.
      * Appends the letter to the current input word if the length is less than 4.
      * @param letter The pressed letter character.
      */
     private void processLetterKey(char letter) {
         if (currentInputWord.length() < 4) { // Limit input to 4 letters
             currentInputWord.append(Character.toUpperCase(letter));
-            // Optionally update a display of the current input word in the view
-            // view.updateCurrentInputDisplay(currentInputWord.toString());
             view.setMessage("Current input: " + currentInputWord.toString()); // Simple message display
         }
     }

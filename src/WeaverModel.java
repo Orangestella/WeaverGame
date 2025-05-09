@@ -37,7 +37,7 @@ public class WeaverModel extends Observable {
     private WordGenerationStrategy wordGenerationStrategy;
     private boolean isWon;
 
-    private boolean showErrorsFlag = true; // Default to showing errors
+    private boolean showErrorsFlag = false;
     private boolean showPathFlag = false; // Default to not showing path
     private boolean randomWordFlag = false; // Default to fixed words
 
@@ -310,7 +310,7 @@ public class WeaverModel extends Observable {
             currentState = new GameState(this.initialWord, this.targetWord, this.currentPath, this.resultsPath, this.isWon);
 
             // If hint is null, provide a default message for game progress
-            if (hint == null || hint.isEmpty() && !this.isWon) {
+            if (hint == null || !showErrorsFlag || hint.isEmpty() && !this.isWon) {
                 hint = "Continue playing.";
             } else if (this.isWon) {
                 // If won, the tick method should have set the message.

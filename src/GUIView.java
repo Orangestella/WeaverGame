@@ -1,10 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter; // Import KeyAdapter
-import java.awt.event.KeyEvent;   // Import KeyEvent
-import java.awt.event.KeyListener; // Import KeyListener
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -134,7 +129,7 @@ public class GUIView extends JFrame implements Observer {
         showPathCheckBox.addActionListener(e -> controller.handleShowPathFlag(showPathCheckBox.isSelected())); // Link show path checkbox
 
         // Add a KeyListener to the frame to capture physical keyboard input
-        addKeyListener(controller.getKeyListener());
+//        addKeyListener(controller.getKeyListener());
 
         // Add ActionListeners to virtual keyboard buttons
         for (Component panelComponent : keyboardPanel.getComponents()) {
