@@ -134,31 +134,5 @@ public class PathSolutionView extends JFrame { // 您也可以选择继承 JDial
         return wordPanel; // 返回创建好的单词面板
     }
 
-    // 可选：添加一个 main 方法用于单独测试 PathSolutionView
-    public static void main(String[] args) {
-        // 示例用法 (需要一些模拟数据)
-        ArrayList<String> dummyPath = new ArrayList<>();
-        dummyPath.add("PORE");
-        dummyPath.add("CORE");
-        dummyPath.add("CODE");
-        dummyPath.add("RODE");
-        dummyPath.add("RUDE"); // 假设这是一个找到的路径
 
-        String dummyTarget = "RUDE"; // 目标词
-        ArrayList<String> dummyDictionary = new ArrayList<>(); // 需要一个字典来验证路径步骤
-
-        // 填充一个包含路径中所有词以及用于验证的其他词的字典
-        dummyDictionary.add("PORE");
-        dummyDictionary.add("CORE");
-        dummyDictionary.add("CODE");
-        dummyDictionary.add("RODE");
-        dummyDictionary.add("RUDE");
-        dummyDictionary.add("PURE"); // 例如，验证 CORE vs RUDE 时，可能需要 PURE 的计数信息 (尽管 BasicValidator 不需要)
-
-        SwingUtilities.invokeLater(() -> {
-            // 创建 PathSolutionView 实例并显示
-            PathSolutionView view = new PathSolutionView(dummyPath, dummyTarget, dummyDictionary);
-            view.setVisible(true);
-        });
-    }
 }
