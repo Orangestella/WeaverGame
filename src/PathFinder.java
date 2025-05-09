@@ -14,7 +14,7 @@ public class PathFinder {
         }
 
 
-        Map<String, List<String>> patternMap = new HashMap<>();
+        Map<String, List<String>> patternMap = new LinkedHashMap<>();
         for (String word : dictSet) {
             for (int i = 0; i < word.length(); i++) {
                 String pattern = word.substring(0, i) + '*' + word.substring(i + 1);
@@ -60,12 +60,6 @@ public class PathFinder {
         for (String word : path)
             validationResults.add(validator.validate(word, target, dictionary));
         return validationResults;
-    }
-
-    public static GameState completePath(String initial, String target, ArrayList<String> dictionary, WordValidator validator) {
-        ArrayList<String> path = findPathByBFS(initial, target, dictionary);
-        ArrayList<ValidationResult> validationResults = getValidations(target, path, dictionary, validator);
-        return new GameState(initial, target, path, validationResults);
     }
 
 }

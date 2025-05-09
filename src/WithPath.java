@@ -22,7 +22,7 @@ public class WithPath extends  WordGenerationStrategyDecorator{
     }
 
     public ArrayList<String> getPath() {
-        return new ArrayList<> (path);
+        return (this.path != null) ? this.path : new ArrayList<>();
     }
 
 
