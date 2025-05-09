@@ -53,13 +53,26 @@ public class PathFinder {
         return new ArrayList<>();
     }
 
-    public static ArrayList<ValidationResult> getValidations(String target, ArrayList<String> path, ArrayList<String> dictionary, WordValidator validator) {
+    public static ArrayList<ValidationResult> getValidations(String target, ArrayList<String> path, ArrayList<String> dictionary) {
         ArrayList<ValidationResult> validationResults = new ArrayList<>();
-        if (path.isEmpty())
-            throw new RuntimeException("Path not found");
-        for (String word : path)
-            validationResults.add(validator.validate(word, target, dictionary));
-        return validationResults;
+        // 如果路径为 null 或空，或者只包含起始词 (长度 <= 1)，则没有需要验证的步骤
+        if (path == null || path.size() <= 1) {
+            return validationResults; // 返回一个空列表
+        }
+
+        // **在 PathFinder 内部创建一个 BasicValidator 实例用于路径步骤的验证显示**
+        WordValidator pathStepValidator = new BasicValidator(); // **确保 BasicValidator 可以被正确实例化**
+
+        // 从路径的第二个词开始 (索引 1) 遍历，计算每个词的验证结果
+        for (int i = 1; i < path.size(); i++) {
+            String currentWord = path.get(i); // 获取当前路径中的单词
+            // 使用内部创建的 BasicValidator 验证当前词是否符合目标词的规则
+            // **确保 BasicValidator.validate(inputWord, targetWord, dictionary) 的参数顺序正确**
+            // 在这里，currentWord 是本次验证的“输入词”，target 是最终的“目标词”
+            ValidationResult result = pathStepValidator.validate(currentWord, target, dictionary); // **使用内部 Validator 进行验证**
+            validationResults.add(result); // 将验证结果添加到列表中
+        }
+        return validationResults; // 返回验证结果列表
     }
 
 }

@@ -4,14 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f4f2814c-7556-48ba-b8c2-d87c79fc23b1" name="Changes" comment="update GUI view">
-      <change afterPath="$PROJECT_DIR$/src/PathSolutionView.java" afterDir="false" />
+    <list default="true" id="f4f2814c-7556-48ba-b8c2-d87c79fc23b1" name="Changes" comment="update GUI view and path">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GUIController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUIController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/GUIView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUIView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ValidationResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ValidationResult.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLIMain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PathFinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PathFinder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PathSolutionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PathSolutionView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WeaverModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WeaverModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/WithWarning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WithWarning.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +100,8 @@
       <workItem from="1746523343281" duration="4312000" />
       <workItem from="1746607037630" duration="1782000" />
       <workItem from="1746698351151" duration="20126000" />
-      <workItem from="1746753934947" duration="6322000" />
+      <workItem from="1746753934947" duration="7169000" />
+      <workItem from="1746789568669" duration="5183000" />
     </task>
     <task id="LOCAL-00001" summary="initial code">
       <option name="closed" value="true" />
@@ -174,7 +175,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746754029511</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="update GUI view and path">
+      <option name="closed" value="true" />
+      <created>1746760561328</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1746760561328</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -207,7 +216,8 @@
     <MESSAGE value="update path finding" />
     <MESSAGE value="update path completion" />
     <MESSAGE value="update GUI view" />
-    <option name="LAST_COMMIT_MESSAGE" value="update GUI view" />
+    <MESSAGE value="update GUI view and path" />
+    <option name="LAST_COMMIT_MESSAGE" value="update GUI view and path" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
