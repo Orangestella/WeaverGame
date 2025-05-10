@@ -1,77 +1,84 @@
-// File: WeaverModel.java
-// Based on code_2.txt 提供的当前代码
-
 import exceptions.InvalidWordException;
 import exceptions.WordGenerationException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Observable; // 保留 Observable 以支持 GUI
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map; // 需要导入 Map，因为 ValidationResult 中使用了 Map
+import java.util.Observable;
 
-// 确保这些类在正确的包中或已正确导入
-// import your_package_name.GameState; // 如果 notifyUpdate 方法使用了 GameState，需要导入
-// import your_package_name.ValidationResult; // **需要导入 ValidationResult**
-// import your_package_name.LetterState; // 需要导入 LetterState (ValidationResult 中使用)
-// import your_package_name.Notification; // 如果 notifyUpdate 方法使用了 Notification，需要导入
-// import your_package_name.PathFinder; // **需要导入 PathFinder** (用于 getFullSolutionPath)
-// import your_package_name.StrategyFactory;
-// import your_package_name.FixedStrategyFactory;
-// import your_package_name.RandomStrategyFactory;
-// import your_package_name.WordGenerationStrategy;
-// import your_package_name.WithPath; // 保留 WithPath 如果 StrategyFactory 需要它
-// import your_package_name.WordValidator; // **需要导入 WordValidator**
-// import your_package_name.BasicValidator; // **需要导入 BasicValidator**
-// import your_package_name.WithWarning; // **需要导入 WithWarning**
+/**
+ * The central game model for the Weaver game.
+ * Manages game state, word validation, dictionary loading, and observer updates.
+ *
+ * <p><b>Class Invariant:</b>
+ * <ul>
+ *   <li>{@code dictionary} ≠ null ∧ contains only valid 4-letter words</li>
+ *   <li>{@code initialWord} ≠ null ∧ is in dictionary ∧ length == targetWord.length()</li>
+ *   <li>{@code targetWord} ≠ null ∧ is in dictionary ∧ length == initialWord.length()</li>
+ *   <li>{@code currentPath} ≠ null ∧ starts with initialWord</li>
+ *   <li>{@code resultsPath} size == currentPath.size() - 1 (each step has a result)</li>
+ *   <li>{@code validator} ≠ null ∧ validates words against target using dictionary rules</li>
+ *   <li>{@code strategyFactory} ≠ null ∧ generates valid word pairs</li>
+ * </ul>
+ */
+public class WeaverModel extends Observable {
 
-public class WeaverModel extends Observable { // 保留继承 Observable 以支持 GUI
-    private ArrayList<String> dictionary; // 字典
-    private ArrayList<String> currentPath; // 玩家当前的路径
-    private ArrayList<ValidationResult> resultsPath; // 玩家路径中每一步的验证结果
-    private String initialWord; // 游戏的起始词
-    private String targetWord; // 游戏的目标词
-    private StrategyFactory strategyFactory; // 策略工厂，用于生成词对策略
-    private WordGenerationStrategy wordGenerationStrategy; // 当前的词对生成策略
-    private boolean isWon; // 游戏是否胜利的标志
-
-    private boolean showErrorsFlag = false; // 控制是否显示错误信息
-    // 根据您提供的当前代码，showPathFlag 字段已经移除了
-
-    private boolean randomWordFlag = false; // 控制是否随机生成词对
-
-    private WordValidator validator; // 当前活跃的 Validator (可能包含 WithWarning)
-    private WordValidator baseValidator; // 基础 Validator (不带装饰器)
+    // Game data
+    private ArrayList<String> dictionary;
+    private ArrayList<String> currentPath;
+    private ArrayList<ValidationResult> resultsPath;
+    private String initialWord;
+    private String targetWord;
+    private StrategyFactory strategyFactory;   // Factory for generating word pairs
+    private WordGenerationStrategy wordGenerationStrategy; // Strategy for generating words
+    private boolean isWon;
+    private boolean showErrorsFlag = false; // Controls whether errors are shown
+    private boolean showPathFlag = false; // Controls whether solution path is shown
+    private boolean randomWordFlag = false;
+    private WordValidator validator;
+    private WordValidator baseValidator;
 
     /**
      * Constructs a new WeaverModel.
-     * Loads the dictionary and initializes validator and strategy based on default flags.
+     * Loads dictionary and initializes validators and strategies based on default flags.
      *
-     * @throws IOException if the dictionary file cannot be loaded.
+     * @pre.    Dictionary file exists and contains at least two 4-letter words
+     *          BaseValidator can be initialized without error
+     * @post.   dictionary is loaded with valid 4-letter words
+     *          baseValidator is initialized
+     *          strategyFactory is set to FixedStrategyFactory by default
+     *          randomWordFlag == false
+     *          showErrorsFlag == false
+     *          game is not won
+     *
+     * @throws IOException if dictionary cannot be loaded
      */
     public WeaverModel() throws IOException {
-        loadDictionary(); // 加载字典
-        this.baseValidator = new BasicValidator(); // 初始化基础 Validator
-        updateValidator(); // 根据默认标志设置初始的 Validator (可能带 WithWarning)
-        updateStrategy(); // 根据默认标志设置初始的 Strategy (可能带 WithPath)
-        // 游戏将在后续由 Controller (GUI) 或 CLIMain 调用 initialize() 方法启动。
+        loadDictionary();
+        this.baseValidator = new BasicValidator();
+        updateValidator();
+        updateStrategy();
     }
 
     /**
-     * Loads the dictionary words from the dictionary.txt file.
-     * Only loads 4-letter words and converts them to uppercase.
+     * Loads 4-letter words from dictionary.txt and converts them to uppercase.
      *
-     * @throws IOException if the dictionary file cannot be read or is not found.
+     * @pre.    dictionary.txt exists in resources folder
+     *          file contains lines of text (some possibly not 4 letters)
+     * @post.   dictionary contains only uppercase 4-letter words from file
+     *          if fewer than 2 words: IOException is thrown
+     *
+     * @throws IOException if dictionary file cannot be read or not found
      */
     private void loadDictionary() throws IOException {
         dictionary = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/dictionary.txt"),
-                        "Dictionary file not found in classpath: /dictionary.txt")))) {
+                new InputStreamReader(Objects.requireNonNull(
+                        getClass().getResourceAsStream("/dictionary.txt"),
+                        "Dictionary file not found in classpath: /dictionary.txt"
+                ))
+        )) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.length() == 4) {
@@ -79,6 +86,7 @@ public class WeaverModel extends Observable { // 保留继承 Observable 以支�
                 }
             }
         }
+
         if (dictionary == null || dictionary.size() < 2) {
             throw new IOException("Dictionary does not contain enough 4-letter words (requires at least 2).");
         }
@@ -89,149 +97,116 @@ public class WeaverModel extends Observable { // 保留继承 Observable 以支�
      * Selects initial and target words based on the randomWordFlag,
      * clears the current path and results. Notifies observers (for GUI).
      *
-     * @throws WordGenerationException if the word generation strategy fails to produce a valid word pair.
+     * @pre.    wordGenerationStrategy ≠ null
+     *          dictionary contains both generated words
+     * @post.   initialWord and targetWord are valid 4-letter words from dictionary
+     *          currentPath starts with initialWord
+     *          resultsPath is empty
+     *          isWon == false
+     *          observers are notified with start message
+     *
+     * @throws WordGenerationException if strategy fails to generate valid word pair
      */
-    public void initialize() throws WordGenerationException { // 保持抛出异常
-        // 根据当前的标志更新 Strategy 和 Validator
-        updateStrategy(); // 可能根据 randomWordFlag 选择 WithPath
-        updateValidator(); // 可能根据 showErrorsFlag 添加 WithWarning
+    public void initialize() throws WordGenerationException {
+        updateStrategy();
+        updateValidator();
 
-        // 使用当前 Strategy 生成起始词和目标词
-        String[] words;
-        // generateWords 方法可能由 WithPath 装饰器包装，以确保生成的词对之间有路径。
-        // 如果生成失败，会抛出 WordGenerationException。
-        words = wordGenerationStrategy.generateWords(dictionary); // 保持调用不变
-
-
-        // 如果成功生成词对
+        String[] words = wordGenerationStrategy.generateWords(dictionary);
         this.initialWord = words[0];
         this.targetWord = words[1];
+        this.isWon = false;
 
-        this.isWon = false; // 重置为未胜利状态
-        currentPath = new ArrayList<>(); // 重新初始化玩家路径
-        currentPath.add(initialWord); // 将起始词添加到玩家路径中
-        resultsPath = new ArrayList<>(); // 重新初始化验证结果列表
+        currentPath = new ArrayList<>();
+        currentPath.add(initialWord);
 
-        // **通知 View (GUI) 关于初始游戏状态**
-        // notifyUpdate 方法会根据 showErrorsFlag 决定是否在 GUI 中显示“游戏开始”的提示
-        notifyUpdate("Game started. Enter your first word.", null); // 保持通知调用
+        resultsPath = new ArrayList<>();
+
+        notifyUpdate("Game started. Enter your first word.", null);
     }
 
     /**
-     * Processes a player's word input, updates the game state, and returns the validation result.
-     * Notifies observers (for GUI) about the updated game state.
+     * Processes a player's word input, updates game state, and returns validation result.
      *
-     * @param word The word entered by the player.
-     * @return The ValidationResult for the submitted word. The result includes validation states and potentially a message from decorators.
-     * @throws InvalidWordException if basic validation (dictionary/length) or the one-letter rule fails *before* a ValidationResult is fully formed.
-     * @throws RuntimeException for other unexpected errors during processing.
+     * @pre.    word ≠ null ∧ word.length() == targetWord.length()
+     *          last word in currentPath is valid (i.e., not empty)
+     *          dictionary contains all valid words
+     * @post.   if valid move: word is added to currentPath
+     *          result is added to resultsPath
+     *          isWon reflects whether word == targetWord
+     *          observers are notified with appropriate message
+     *
+     * @param word The word entered by the player
+     * @return ValidationResult containing letter states and optional message
+     * @throws InvalidWordException if word is invalid (not in dict or length mismatch)
+     * @throws RuntimeException for unexpected errors during processing
      */
-    // **修改 tick 方法签名，使其返回 ValidationResult**
-    public ValidationResult tick(String word) throws InvalidWordException, RuntimeException { // 保持抛出异常
+    public ValidationResult tick(String word) throws InvalidWordException, RuntimeException {
         word = word.toUpperCase();
-
         ArrayList<String> nextPath = new ArrayList<>(currentPath);
         ArrayList<ValidationResult> nextResultsPath = new ArrayList<>(resultsPath);
-
-        ValidationResult result = null; // 用于存储本次验证的结果
+        ValidationResult result = null;
 
         try {
-            // **第一步：基本验证 (字典中是否存在，长度是否正确)**
-            // validator 字段已经根据 showErrorsFlag 自动包含了 WithWarning 装饰器 (如果需要的话)。
-            // 如果验证失败 (不在字典，长度错误)，validator.validate 方法会抛出 InvalidWordException。
-            // 确保 validator.validate(inputWord, targetWord, dictionary) 的参数顺序正确。
-            result = validator.validate(word, this.targetWord, this.dictionary); // 保持调用不变
+            result = validator.validate(word, this.targetWord, this.dictionary);
 
-            // **第二步：游戏规则验证 (与上一个词是否只差一个字母)**
-            // 这个检查在基本验证通过后进行。
-            if (!nextPath.isEmpty()) { // 确保玩家路径不为空 (至少包含起始词)。
-                String lastWord = nextPath.get(nextPath.size() - 1); // 获取路径中的上一个词
-                // isOneLetterDifferent 是一个私有助手方法，检查两个词是否只差一个字母。
+            if (!nextPath.isEmpty()) {
+                String lastWord = nextPath.get(nextPath.size() - 1);
                 if (!isOneLetterDifferent(lastWord, word)) {
-                    // 如果不符合一个字母差异规则，抛出 InvalidWordException。
-                    // 这个异常将在 CLIMain (和 GUI Controller) 中捕获并显示消息。
-                    throw new InvalidWordException("Word must differ by exactly one letter from the previous word."); // 保持抛出
+                    throw new InvalidWordException("Word must differ by exactly one letter from the previous word.");
                 }
             } else {
-                // 如果 tick 在 path 为空时被调用，通常意味着游戏流程有问题。
-                // 应该始终从 initialize 添加起始词开始。
-                throw new InvalidWordException("Game state error: Path is empty before the first player input step."); // 保持抛出
+                throw new InvalidWordException("Game state error: Path is empty before the first player input step.");
             }
 
-            // **如果所有验证都通过 (基本验证 + 一个字母差异规则)，则将词和结果添加到临时的路径列表中**
-            nextPath.add(word); // 将通过验证的玩家输入词添加到临时路径
-            nextResultsPath.add(result); // 将验证结果添加到临时结果列表
+            nextPath.add(word);
+            nextResultsPath.add(result);
+            this.currentPath = nextPath;
+            this.resultsPath = nextResultsPath;
+            this.isWon = result.getValid();
 
-            // **更新正式的 currentPath 和 resultsPath**
-            this.currentPath = nextPath; // 提交更改
-            this.resultsPath = nextResultsPath; // 提交更改
-
-            // **检查是否胜利**
-            this.isWon = result.getValid(); // 胜利条件是最后一个词的验证结果有效 (与目标词一致)
-
-            // **设置主要的提示信息**
-            // 如果 WithWarning 装饰器活跃，result.getMessage() 会包含错误或“You win!”/“Valid word.”等信息。
-            // 如果 WithWarning 不活跃，result.getMessage() 可能是 null 或默认值。
             String message = result.getMessage();
-            String runtimeWarning = null; // 运行时警告通常来自 catch 块
-
-            // 如果游戏胜利，确保发送一个明确的胜利消息给 GUI (即使 WithWarning 可能已经设置了)
-            if (this.isWon && (message == null || message.isEmpty() || !message.equalsIgnoreCase("You won the game!"))) {
-                message = "You won the game!"; // 覆盖可能的 WithWarning 消息，确保胜利消息一致
-            }
-
-            // **通知 View (GUI) 更新**
-            // notifyUpdate 会根据 showErrorsFlag 决定消息在 GUI 中是否可见。
-            notifyUpdate(message, runtimeWarning); // 保持通知调用
-
-            // **返回验证结果供 CLI 使用**
-            // CLI 将使用这个返回的 ValidationResult 来获取详细验证状态和消息
-            return result; // 返回结果
-
-        } catch (InvalidWordException e) {
-            // **如果捕获到 InvalidWordException (来自 Validator 或一个字母差异检查)**
-            // 不更新路径和结果列表，游戏状态保持未胜利
-            this.isWon = false;
-
-            // 获取异常中的错误消息，用于通知 GUI
-            String message = e.getMessage();
             String runtimeWarning = null;
 
-            // **通知 View (GUI) 更新，包含错误消息**
-            notifyUpdate(message, runtimeWarning); // 保持通知调用，将错误消息发送给 GUI
+            if (this.isWon && (message == null || message.isEmpty() || !message.equalsIgnoreCase("You won the game!"))) {
+                message = "You won the game!";
+            }
 
-            // **将异常重新抛出，以便 CLIMain (和 GUI Controller) 可以捕获并显示错误消息**
-            throw e; // 保持重新抛出异常
-        } catch (RuntimeException e) {
-            // **捕获处理过程中可能发生的其他意外运行时错误**
-            // 不更新路径和结果列表，游戏状态保持未胜利
+            notifyUpdate(message, runtimeWarning);
+            return result;
+
+        } catch (InvalidWordException e) {
             this.isWon = false;
+            String message = e.getMessage();
+            String runtimeWarning = null;
+            notifyUpdate(message, runtimeWarning);
+            throw e;
 
-            // 格式化运行时错误信息，用于通知 GUI
-            String message = null; // 没有具体的 hint message
+        } catch (RuntimeException e) {
+            this.isWon = false;
+            String message = null;
             String runtimeWarning = "An unexpected error occurred during tick: " + e.getMessage();
-            System.err.println(runtimeWarning); // 同时打印到控制台方便调试
-
-            // **通知 View (GUI) 更新，包含运行时警告**
-            notifyUpdate(message, runtimeWarning); // 保持通知调用，将警告发送给 GUI
-
-            // **将异常重新抛出，由 CLIMain (和 GUI Controller) 捕获并处理**
-            throw e; // 保持重新抛出异常
+            System.err.println(runtimeWarning);
+            notifyUpdate(message, runtimeWarning);
+            throw e;
         }
     }
 
     /**
-     * Helper method to check if two words of the same length differ by exactly one letter.
-     * Assumes words are of the same length (Validator should enforce this).
-     * @param word1 The first word.
-     * @param word2 The second word.
-     * @return True if they differ by exactly one letter, false otherwise.
+     * Checks if two words of equal length differ by exactly one letter.
+     *
+     * @pre.    word1 ≠ null ∧ word2 ≠ null
+     *          word1.length() == word2.length()
+     * @post.   returns true iff exactly one character differs between the words
+     *
+     * @param word1 First word
+     * @param word2 Second word
+     * @return true if words differ by exactly one letter
      */
     private boolean isOneLetterDifferent(String word1, String word2) {
-        // 保持不变，作为私有助手方法
         if (word1 == null || word2 == null || word1.length() != word2.length()) {
             return false;
         }
+
         int diffCount = 0;
         for (int i = 0; i < word1.length(); i++) {
             if (word1.charAt(i) != word2.charAt(i)) {
@@ -241,243 +216,248 @@ public class WeaverModel extends Observable { // 保留继承 Observable 以支�
         return diffCount == 1;
     }
 
-
     /**
-     * Notifies observers about the current game state.
-     * Conditionally sets the hint and runtimeWarning messages based on the showErrorsFlag.
-     * This version provides the player's current progress state in the GameState object.
-     * This method is primarily for the GUI.
+     * Notifies observers about current game state.
+     * Conditionally sets hint and warning messages based on showErrorsFlag.
      *
-     * @param hint The primary message (e.g., from Validator or Exception) to potentially display. Can be null.
-     * @param runtimeWarning A warning message (e.g., from unexpected errors) to potentially display. Can be null.
+     * @pre.    currentState ≠ null
+     *          messageToSend may be null
+     *          warningToSend may be null
+     * @post.   observers are notified with Notification object containing:
+     *          - gameState
+     *          - messageToSend (based on showErrorsFlag)
+     *          - warningToSend (if any)
+     *
+     * @param hint         Optional hint message
+     * @param runtimeWarning Optional warning message
      */
     private void notifyUpdate(String hint, String runtimeWarning) {
-        // 保持不变，用于通知 GUI
         setChanged();
-
-        // 创建 GameState 对象 (假设 GameState 构造函数和字段匹配)
         GameState currentState = new GameState(this.initialWord, this.targetWord, this.currentPath, this.resultsPath, this.isWon);
 
         String messageToSend = null;
         String warningToSend = null;
 
-        // 根据 showErrorsFlag 决定发送给 GUI 的消息内容
         if (this.showErrorsFlag) {
             warningToSend = runtimeWarning;
             if (hint != null && !hint.isEmpty()) {
                 messageToSend = hint;
+            } else if (this.isWon) {
+                messageToSend = "You won the game!";
             } else {
-                // 如果没有具体的 hint，根据游戏状态设置一个默认提示 (在 showErrorsFlag 为 true 时)
-                if (this.isWon) {
-                    messageToSend = "You won the game!";
-                } else {
-                    messageToSend = "Continue playing.";
-                }
+                messageToSend = "Continue playing.";
             }
-        } else {
-            // 如果 showErrorsFlag 为 false，将发送给 GUI 的提示信息设置为空，以隐藏它们
-            messageToSend = null;
-            warningToSend = null;
         }
 
-        // 创建 Notification 对象 (假设 Notification 构造函数是 Notification(GameState gameState, String hint, String runtimeWarning))
         Notification notification = new Notification(currentState, messageToSend, warningToSend);
-
-        // 通知所有注册的观察者 (GUIView)
         notifyObservers(notification);
     }
 
-
     /**
-     * Triggers a notification to observers with the current game state.
-     * This method is called by the Controller (GUI) when the view needs to be updated
-     * based on flag changes or initial display, without player input.
+     * Triggers a notification to observers with current game state.
+     * Used when view needs updating without player input.
+     *
+     * @pre.    none
+     * @post.   observers are notified with current game state
+     *          no custom message or warning is sent
      */
     public void notifyObserversWithCurrentState() {
-        // 保持不变，用于触发 GUI 更新
-        // 调用内部的 notifyUpdate 方法，传入 null 作为初始 hint/warning
-        // notifyUpdate 会根据 showErrorsFlag 和当前状态生成默认消息 (如果允许)
         notifyUpdate(null, null);
     }
 
-
-    // --- Getters and Setters for Flags ---
-
+    /**
+     * Gets the current value of showErrorsFlag.
+     * @return true if showing errors is enabled
+     */
     public boolean isShowErrorsFlag() {
-        // 保持不变，提供公共 getter
         return showErrorsFlag;
     }
 
     /**
-     * Sets the show errors flag and updates the validator.
+     * Sets the show errors flag and updates validator accordingly.
      * Notifies observers for GUI update.
      *
-     * @param showErrorsFlag The new value for the flag.
+     * @pre.    showErrorsFlag is either true or false
+     * @post.   this.showErrorsFlag == showErrorsFlag
+     *          validator is updated based on new setting
+     *          observers are notified
+     *
+     * @param showErrorsFlag New value for the flag
      */
     public void setShowErrorsFlag(boolean showErrorsFlag) {
-        // 保持不变，更新标志，更新 Validator，并通知 GUI
         if (this.showErrorsFlag != showErrorsFlag) {
-            this.showErrorsFlag = showErrorsFlag; // 更新 showErrorsFlag 的状态
-            updateValidator(); // 根据新的 showErrorsFlag 状态更新 Validator (添加或移除 WithWarning)
-            // 触发 View (GUI) 更新，以便 View 根据新的 showErrorsFlag 状态决定是否显示消息
-            notifyObserversWithCurrentState(); // 保持通知调用
+            this.showErrorsFlag = showErrorsFlag;
+            updateValidator();
+            notifyObserversWithCurrentState();
         }
     }
 
-    // **移除与 showPathFlag 相关的 getter 和 setter 方法**
-    // 根据您提供的当前代码，这些方法应该已经移除了
+    /**
+     * Gets the current value of randomWordFlag.
+     * @return true if using random word generation
+     */
+    public boolean isShowPathFlag() {
+        return showPathFlag;
+    }
 
+    /**
+     * Sets the show path flag.
+     * This flag controls whether the solution path window is displayed.
+     *
+     * @param showPathFlag New value for the flag
+     */
+    public void setShowPathFlag(boolean showPathFlag) {
+        this.showPathFlag = showPathFlag;
+    }
+
+    /**
+     * Gets the current value of randomWordFlag.
+     * @return true if using random word generation
+     */
     public boolean isRandomWordFlag() {
-        // 保持不变，提供公共 getter
         return randomWordFlag;
     }
 
     /**
-     * Sets the random word flag and updates the strategy.
+     * Sets the random word flag and updates strategy accordingly.
      *
-     * @param randomWordFlag The new value for the flag.
+     * @pre.    randomWordFlag is either true or false
+     * @post.   this.randomWordFlag == randomWordFlag
+     *          strategy is updated (with or without WithPath decorator)
+     *          if dictionary is insufficient, uses fixed fallback strategy
+     *
+     * @param randomWordFlag New value for the flag
      */
     public void setRandomWordFlag(boolean randomWordFlag) {
-        // 保持不变，更新标志和 Strategy
         if (this.randomWordFlag != randomWordFlag) {
-            this.randomWordFlag = randomWordFlag; // 更新 randomWordFlag 的状态
-            updateStrategy(); // 根据新的 randomWordFlag 状态更新 Strategy (可能选择 WithPath)
-            // 注意：修改 randomWordFlag 通常需要开始一个新游戏 (调用 initialize) 才会对起始词和目标词生效。
+            this.randomWordFlag = randomWordFlag;
+            updateStrategy();
         }
     }
 
-    // --- Internal Update Methods ---
-
     /**
-     * Updates the word generation strategy based on current flags (randomWordFlag).
-     * Decides whether to use a basic strategy or wrap it with WithPath.
+     * Updates the word generation strategy based on current flags.
+     * Wraps with WithPath decorator if needed.
+     *
+     * @pre.    dictionary is non-null and sufficient for fixed strategy
+     * @post.   wordGenerationStrategy is updated with correct factory
+     *          if randomWordFlag is true: uses RandomStrategyFactory
+     *          if randomWordFlag is false: uses FixedStrategyFactory with default words
      */
     public void updateStrategy() {
-        // 保持不变
         StrategyFactory factory;
         if (randomWordFlag) {
-            factory = new RandomStrategyFactory(); // 随机词生成器
+            factory = new RandomStrategyFactory();
         } else {
-            // 固定词生成器
             if (dictionary == null || dictionary.size() < 2) {
                 System.err.println("Error: Dictionary not loaded or insufficient words for fixed strategy.");
-                // 假设字典有问题，固定词生成器可能无法工作，这里使用固定值避免崩溃
-                factory = new FixedStrategyFactory("PORE", "RUDE"); // 确保 FixedStrategyFactory 构造函数匹配
+                factory = new FixedStrategyFactory("EAST", "WEST");
             } else {
-                // 使用固定的起始词和目标词，例如 PORE 和 RUDE
-                factory = new FixedStrategyFactory("PORE", "RUDE");
+                factory = new FixedStrategyFactory("EAST", "WEST");
             }
         }
 
-        WordGenerationStrategy base = factory.createStrategy(dictionary); // 创建基础 Strategy
-        // **根据 randomWordFlag 决定是否应用 WithPath 装饰器**
-        // WithPath 装饰器用于在生成随机词时确保它们之间有路径。
-        // 只在生成随机词时才使用 WithPath。
-        this.wordGenerationStrategy = randomWordFlag ?
-                new WithPath(base): // 如果随机词，则包装 WithPath
-                base; // 如果固定词，则不包装 WithPath
+        WordGenerationStrategy base = factory.createStrategy(dictionary);
+        this.wordGenerationStrategy = randomWordFlag ? new WithPath(base) : base;
     }
 
     /**
-     * Updates the word validator based on the showErrorsFlag.
-     * Applies the WithWarning decorator if the flag is true.
+     * Updates the validator based on current flags.
+     * Applies WithWarning decorator if showErrorsFlag is enabled.
+     *
+     * @pre.    baseValidator is not null
+     * @post.   validator is either baseValidator or WithWarning wrapper
+     *          depending on showErrorsFlag
      */
     public void updateValidator() {
-        // 保持不变
-        this.validator = this.baseValidator; // 从基础 Validator 开始
+        this.validator = this.baseValidator;
         if (showErrorsFlag) {
-            this.validator = new WithWarning(this.validator); // 如果 showErrorsFlag 为 true，包装 WithWarning
+            this.validator = new WithWarning(this.validator);
         }
     }
 
     /**
-     * Resets the current game state, clearing the player's path and results
-     * while keeping the same initial and target words. Notifies observers (for GUI).
+     * Resets game state, keeping the same initial and target words.
+     * Clears the path and notifies observers.
+     *
+     * @pre.    initialWord and targetWord are valid and non-null
+     * @post.   currentPath contains only initialWord
+     *          resultsPath is cleared
+     *          isWon == false
+     *          observers are notified with reset message
      */
     public void resetGame() {
-        // 保持不变，重置游戏状态并通知 GUI
-        this.isWon = false; // 重置为未胜利状态
-        currentPath = new ArrayList<>(); // 清空玩家路径
-        currentPath.add(initialWord); // 添加起始词回路径
-        resultsPath = new ArrayList<>(); // 清空验证结果列表
-
-        // 通知 View (GUI) 关于重置后的游戏状态
-        // notifyUpdate 方法将根据 showErrorsFlag 决定是否显示消息
-        notifyUpdate("Game reset. Enter your first word.", null); // 保持通知调用
+        this.isWon = false;
+        currentPath = new ArrayList<>();
+        currentPath.add(initialWord);
+        resultsPath = new ArrayList<>();
+        notifyUpdate("Game reset. Enter your first word.", null);
     }
 
-    // --- **添加公共 Getter 方法，暴露游戏状态供 CLI 获取** ---
-    // 这些 getter 方法不会影响 GUI 的 Observer 模式，只是提供一种拉取状态的手段。
-    // 返回 ArrayList 时返回副本，防止外部直接修改 Model 的内部状态。
-
     /**
-     * Gets the initial word of the current game.
-     * @return The initial word.
+     * Gets the initial word of the game.
+     * @return The starting word
      */
     public String getInitialWord() {
-        // **添加公共 Getter**
         return initialWord;
     }
 
     /**
-     * Gets the target word of the current game.
-     * @return The target word.
+     * Gets the target word of the game.
+     * @return The goal word
      */
     public String getTargetWord() {
-        // **添加公共 Getter**
         return targetWord;
     }
 
     /**
-     * Gets the current player's path.
-     * @return The current path as a new ArrayList of strings (a read-only copy).
+     * Gets the player's current word path.
+     * Returns a copy to prevent external modification.
+     *
+     * @return A list of words in the current path
      */
     public ArrayList<String> getCurrentPath() {
-        // **添加公共 Getter**
-        // 返回一个副本，防止外部直接修改 Model 的内部列表
         return new ArrayList<>(currentPath);
     }
 
     /**
-     * Gets the validation results for the steps in the player's path.
-     * @return The validation results as a new ArrayList of ValidationResult (a read-only copy).
+     * Gets validation results for each step in the path.
+     * Returns a copy to prevent external modification.
+     *
+     * @return List of ValidationResult objects
      */
     public ArrayList<ValidationResult> getResultsPath() {
-        // **添加公共 Getter**
-        // 返回一个副本
         return new ArrayList<>(resultsPath);
     }
 
     /**
      * Checks if the game is currently won.
-     * @return True if the game is won, false otherwise.
+     * @return true if player reached the target word
      */
     public boolean isWon() {
-        // **添加公共 Getter**
         return isWon;
     }
 
     /**
-     * Gets the dictionary.
-     * @return The dictionary (a read-only copy recommended).
+     * Gets the dictionary used in the game.
+     * Returns a copy to prevent external modification.
+     *
+     * @return The list of valid words
      */
     public ArrayList<String> getDictionary() {
-        // **添加公共 Getter**
-        // 返回一个副本
         return new ArrayList<>(dictionary);
     }
 
     /**
-     * Gets the full solution path from the initial word to the target word.
-     * This method calculates the path on demand and does NOT affect the game state.
-     * @return The full solution path as an ArrayList of strings, or an empty list if no path is found.
+     * Gets the full solution path from initial to target word.
+     * Uses PathFinder.findPathByBFS internally.
+     *
+     * @post.   returned path contains all steps from initial to target
+     *          or null if no path exists
+     *
+     * @return Full solution path as an ArrayList
      */
     public ArrayList<String> getFullSolutionPath() {
-        // 保持不变 (假设 PathFinder.findPathByBFS 存在并接收 correct 参数)
-        ArrayList<String> fullPath = PathFinder.findPathByBFS(this.initialWord, this.targetWord, this.dictionary);
-        return fullPath; // 返回一个新列表
+        return PathFinder.findPathByBFS(this.initialWord, this.targetWord, this.dictionary);
     }
-
-    // **移除 private notifyFullPathUpdate() 方法** (根据您提供的当前代码，这个方法应该已经移除了)
-
 }

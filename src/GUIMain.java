@@ -2,40 +2,46 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import java.io.IOException;
 
-// Ensure these classes are in the correct package or imported correctly
-// import your_package_name.WeaverModel;
-// import your_package_name.GUIView;
-// import your_package_name.GUIController;
-
+/**
+ * The main entry point for the GUI version of the Weaver game.
+ * This class initializes the application components and handles initialization errors.
+ *
+ * <p><b>Class Invariant:</b>
+ * <ul>
+ *   <li>{@code model} is initialized successfully or the application terminates</li>
+ *   <li>{@code view} is created and displayed properly or the application terminates</li>
+ *   <li>{@code controller} is registered with the view and model</li>
+ *   <li>All GUI operations run on the Event Dispatch Thread (EDT)</li>
+ * </ul>
+ */
 public class GUIMain {
 
     /**
      * The main entry point for the GUI version of the Weaver game.
+     *
+     * @pre.    System supports graphical interface
+     *          args may be null or unused
+     * @post.   If initialization succeeds:
+     *          - model is initialized with valid dictionary
+     *          - view is created and visible
+     *          - controller is registered and event handlers are active
+     *          - GUI runs on EDT
+     *          If initialization fails:
+     *          - Error dialog is shown
+     *          - Application exits with non-zero status
+     *
      * @param args Command line arguments (not used in this application).
      */
     public static void main(String[] args) {
         // Run the GUI creation on the Event Dispatch Thread (EDT)
         SwingUtilities.invokeLater(() -> {
             try {
-                // 1. Create the Model
                 WeaverModel model = new WeaverModel();
-
-                // 2. Create the View
                 GUIView view = new GUIView();
-
-                // 3. Create the Controller, linking Model and View
                 GUIController controller = new GUIController(model, view);
-
-                // 4. Initialize the Model to set up the first game state
-                // This will trigger the first update to the View via the Observer pattern.
                 model.initialize();
 
-                // The View's JFrame is set to be visible in its constructor,
-                // so the GUI window will appear after initialization.
-
             } catch (IOException e) {
-                // Handle potential error during dictionary loading
-                e.printStackTrace();
                 JOptionPane.showMessageDialog(null,
                         "Error loading dictionary file: " + e.getMessage(),
                         "Initialization Error",
@@ -43,8 +49,6 @@ public class GUIMain {
                 // Exit the application if the dictionary cannot be loaded
                 System.exit(1);
             } catch (Exception e) {
-                // Catch any other unexpected errors during initialization
-                e.printStackTrace();
                 JOptionPane.showMessageDialog(null,
                         "An unexpected error occurred during startup: " + e.getMessage(),
                         "Initialization Error",

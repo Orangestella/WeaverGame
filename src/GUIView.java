@@ -1,165 +1,134 @@
-// File: GUIView.java
-// Based on code_2.txt 提供的当前代码
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
-
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
-// 确保这些类在正确的包中或已正确导入
-// import your_package_name.GameState;
-// import your_package_name.ValidationResult;
-// import your_package_name.LetterState;
-// import your_package_name.Notification;
-// import your_package_name.GUIController;
-
-
+/**
+ * The main graphical user interface for the Weaver game.
+ * Displays game state, handles user input from buttons,
+ * and updates display based on game model changes.
+ *
+ * <p><b>Class Invariant:</b>
+ * <ul>
+ *   <li>{@code controller} ≠ null ∧ all UI components are initialized</li>
+ *   <li>{@code pathSolutionWindow} is either null or a valid PathSolutionView instance</li>
+ *   <li>{@code gameBoardPanel} always reflects the current game state from the model</li>
+ *   <li>{@code virtual keyboard} buttons are enabled/disabled based on game state</li>
+ * </ul>
+ */
 public class GUIView extends JFrame implements Observer {
-
-    private static final int WORD_LENGTH = 4; // 单词长度为 4
-    private static final int MAX_DISPLAY_ROWS = 10; // 游戏面板最多显示的行数示例
-
-    private JLabel initialWordLabel; // 显示起始词的标签
-    private JLabel targetWordLabel;  // 显示目标词的标签
-    private JPanel gameBoardPanel;   // 显示单词路径的游戏面板
-    private JPanel keyboardPanel;    // 虚拟键盘面板
-    private JButton resetButton;     // 重置按钮
-    private JButton newGameButton;   // 新游戏按钮
-    private JLabel messageLabel;     // 显示提示消息的标签
-    private JPanel controlPanel;     // 包含按钮和复选框的控制面板
-
-    private JCheckBox showErrorsCheckBox; // 显示错误复选框
-    private JCheckBox randomWordCheckBox; // 随机单词复选框
-
-    // 已经移除与 showPathCheckBox 相关的代码
-
-    // 添加 Show Path 按钮
-    private JButton showPathButton; // 添加显示路径按钮字段
-
-    private GUIController controller; // Controller 的引用
-
-    // 添加用于显示当前玩家输入的 JLabel
-    private JLabel currentInputDisplayLabel; // 显示当前玩家输入的标签
-
+    // UI Components
+    private JLabel initialWordLabel;  // Label showing start word
+    private JLabel targetWordLabel;   // Label showing target word
+    private JPanel gameBoardPanel;    // Panel displaying the path of words
+    private JPanel keyboardPanel;     // Virtual keyboard panel
+    private JButton resetButton;      // Reset button
+    private JButton newGameButton;    // New Game button
+    private JLabel messageLabel;      // Status message label
+    private JPanel controlPanel;      // Panel containing buttons and checkboxes
+    private JCheckBox showErrorsCheckBox;  // Checkbox to toggle error messages
+    private JCheckBox randomWordCheckBox;  // Checkbox to toggle random word mode
+    private JCheckBox showPathCheckBox;    // Checkbox to show solution path
+    private GUIController controller;      // Reference to the controller
+    // Input display
+    private JLabel currentInputDisplayLabel;  // Shows current player input
+    // Solution Path Window
+    private PathSolutionView pathSolutionWindow;  // Reference to solution path window
+    // Keyboard listener
+    private KeyListener gameKeyListener;  // Listener for physical keyboard events
 
     /**
      * Constructs the GUI view for the Weaver game.
-     * Initializes GUI components and layout.
+     * Initializes all components and sets up layout.
+     *
+     * @pre.    System supports graphical interface
+     * @post.   All UI components (labels, panels, buttons) are created and added to frame
+     *          Frame is visible with default size and centered position
+     *          Initial button states are set (reset disabled)
      */
     public GUIView() {
-        super("Weaver Game"); // 窗口标题
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 设置关闭操作
-        setLayout(new BorderLayout()); // 使用 BorderLayout 作为主布局管理器
-
-        // --- 顶部面板：起始词和目标词 ---
+        super("Weaver Game");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        // Top panel: Start Word & Target Word
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout());
         initialWordLabel = new JLabel("Start Word: ____");
         targetWordLabel = new JLabel("Target Word: ____");
         topPanel.add(initialWordLabel);
-        topPanel.add(Box.createHorizontalStrut(50)); // 添加水平间距
+        topPanel.add(Box.createHorizontalStrut(50));
         topPanel.add(targetWordLabel);
-        add(topPanel, BorderLayout.NORTH); // 将顶部面板添加到窗口顶部
-
-        // --- 游戏面板：显示单词路径 ---
+        add(topPanel, BorderLayout.NORTH);
+        // Center panel: Game board (word path)
         gameBoardPanel = new JPanel();
-        // 使用 BoxLayout 垂直排列每个单词面板
         gameBoardPanel.setLayout(new BoxLayout(gameBoardPanel, BoxLayout.Y_AXIS));
-        // 添加一个滚动面板，以防单词过多超出可见区域
         JScrollPane scrollPane = new JScrollPane(gameBoardPanel);
-        scrollPane.setPreferredSize(new Dimension(250, 300)); // 设置滚动面板的优选大小
-        add(scrollPane, BorderLayout.CENTER); // 将滚动面板添加到窗口中心
-
-        // --- 底部面板：包含虚拟键盘、控制按钮和消息标签 ---
+        scrollPane.setPreferredSize(new Dimension(250, 300));
+        add(scrollPane, BorderLayout.CENTER);
+        // Bottom panel: Controls + Keyboard
         JPanel bottomPanel = new JPanel(new BorderLayout());
-
-        // 控制面板 (按钮和复选框)
+        // Control panel: Buttons and checkboxes
         controlPanel = new JPanel(new FlowLayout());
         resetButton = new JButton("Reset");
         newGameButton = new JButton("New Game");
         showErrorsCheckBox = new JCheckBox("Show Errors");
         randomWordCheckBox = new JCheckBox("Random Words");
-
-        // 创建 Show Path 按钮
-        showPathButton = new JButton("Show Solution Path"); // 创建按钮实例
-
-        // 将按钮和复选框添加到控制面板
+        showPathCheckBox = new JCheckBox("Show Solution Path");
         controlPanel.add(resetButton);
         controlPanel.add(newGameButton);
         controlPanel.add(showErrorsCheckBox);
         controlPanel.add(randomWordCheckBox);
-        controlPanel.add(showPathButton); // 将新按钮添加到控制面板
-
-
-        bottomPanel.add(controlPanel, BorderLayout.NORTH); // 将控制面板添加到底部面板顶部
-
-        // **虚拟键盘面板和当前输入显示面板**
-        // 将虚拟键盘和当前输入显示标签放在一个面板中
-        JPanel keyboardAndInputPanel = new JPanel(new BorderLayout()); // 使用 BorderLayout 放置两个组件
-        keyboardPanel = createKeyboardPanel(); // 创建虚拟键盘按钮面板
-        keyboardAndInputPanel.add(keyboardPanel, BorderLayout.CENTER); // 将虚拟键盘面板添加到中心
-
-        // 添加用于显示当前输入的 JLabel
-        currentInputDisplayLabel = new JLabel("Current Input: "); // 初始化标签
-        JPanel inputDisplayPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // 使用 FlowLayout 使标签居中
+        controlPanel.add(showPathCheckBox);
+        bottomPanel.add(controlPanel, BorderLayout.NORTH);
+        // Virtual keyboard and input display
+        keyboardPanel = createKeyboardPanel();
+        JPanel keyboardAndInputPanel = new JPanel(new BorderLayout());
+        keyboardAndInputPanel.add(keyboardPanel, BorderLayout.CENTER);
+        currentInputDisplayLabel = new JLabel("Current Input: ");
+        JPanel inputDisplayPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         inputDisplayPanel.add(currentInputDisplayLabel);
-        keyboardAndInputPanel.add(inputDisplayPanel, BorderLayout.NORTH); // 将输入显示面板添加到北部
-
-        bottomPanel.add(keyboardAndInputPanel, BorderLayout.CENTER); // 将包含键盘和输入显示的面板添加到底部面板中心
-
-        // 消息标签面板 (位于虚拟键盘下方)
+        keyboardAndInputPanel.add(inputDisplayPanel, BorderLayout.NORTH);
+        bottomPanel.add(keyboardAndInputPanel, BorderLayout.CENTER);
+        // Message label panel
         JPanel messagePanel = new JPanel(new FlowLayout());
-        messageLabel = new JLabel("Enter your first word."); // 初始化消息标签的文本
-        messageLabel.setForeground(Color.BLUE); // 可选：设置消息颜色
+        messageLabel = new JLabel("Enter your first word.");
+        messageLabel.setForeground(Color.BLUE);
         messagePanel.add(messageLabel);
-        bottomPanel.add(messagePanel, BorderLayout.SOUTH); // 将消息面板添加到底部面板底部
-
-        add(bottomPanel, BorderLayout.SOUTH); // 将整个底部面板添加到窗口底部
-
-        // --- 窗口设置 ---
-        pack(); // 自动调整窗口大小以适应内容
-        setLocationRelativeTo(null); // 窗口居中显示
-        setVisible(true); // 设置窗口可见
-
-        // 不再需要设置窗口可聚焦以接收物理键盘事件
-        // setFocusable(true);
-        // requestFocusInWindow();
-
-
-        // 按钮初始状态设置
-        resetButton.setEnabled(false); // 初始时重置按钮禁用
-        // showPathButton 可以根据游戏状态启用/禁用，这里保持始终启用简单处理
+        bottomPanel.add(messagePanel, BorderLayout.SOUTH);
+        add(bottomPanel, BorderLayout.SOUTH);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+        setFocusable(true);
+        requestFocusInWindow();
+        // Initial button states
+        resetButton.setEnabled(false);
     }
 
     /**
-     * Sets the controller for this view.
-     * The controller will handle user interactions.
-     * Event listeners are hooked up here, linking GUI component actions to controller methods.
+     * Sets the controller and attaches event listeners to GUI components.
      *
-     * @param controller The GUIController instance.
+     * @pre.    controller ≠ null
+     * @post.   All buttons and checkboxes are linked to controller methods
+     *          physical keyboard listener is registered
+     *          virtual keyboard buttons are linked to handleVirtualKeyPress
+     *
+     * @param controller The GUIController instance
      */
     public void setController(GUIController controller) {
         this.controller = controller;
-        // 添加按钮和复选框的 ActionListeners，链接到 Controller 的处理方法
-        resetButton.addActionListener(e -> controller.handleResetAction());
-        newGameButton.addActionListener(e -> controller.handleNewGameAction());
-        showErrorsCheckBox.addActionListener(e -> controller.handleShowErrorsFlag(showErrorsCheckBox.isSelected()));
-        randomWordCheckBox.addActionListener(e -> controller.handleRandomWordFlag(randomWordCheckBox.isSelected()));
-
-        // 为新的 showPathButton 添加 ActionListener
-        showPathButton.addActionListener(e -> {
-            if (this.controller != null) {
-                this.controller.handleShowPathAction();
-            }
-        });
-
-        // 移除物理键盘 KeyListener 的添加代码 (您应该已经移除了)
-        // addKeyListener(controller.getKeyListener());
-
-        // 为虚拟键盘按钮添加 ActionListeners
+        resetButton.addActionListener(e -> this.controller.handleResetAction());
+        newGameButton.addActionListener(e -> this.controller.handleNewGameAction());
+        showErrorsCheckBox.addActionListener(e -> this.controller.handleShowErrorsFlag(showErrorsCheckBox.isSelected()));
+        randomWordCheckBox.addActionListener(e -> this.controller.handleRandomWordFlag(randomWordCheckBox.isSelected()));
+        showPathCheckBox.addActionListener(e -> this.controller.handleShowPathFlag(showPathCheckBox.isSelected()));
+        if (this.controller != null) {
+            this.gameKeyListener = this.controller.getKeyListener();
+            this.addKeyListener(this.gameKeyListener);
+        }
         if (keyboardPanel != null) {
             for (Component panelComponent : keyboardPanel.getComponents()) {
                 if (panelComponent instanceof JPanel) {
@@ -167,53 +136,49 @@ public class GUIView extends JFrame implements Observer {
                     for (Component buttonComponent : rowPanel.getComponents()) {
                         if (buttonComponent instanceof JButton) {
                             JButton button = (JButton) buttonComponent;
-                            button.addActionListener(e -> {
-                                if (this.controller != null) {
-                                    this.controller.handleVirtualKeyPress(button.getText());
-                                }
-                            });
+                            button.addActionListener(e -> this.controller.handleVirtualKeyPress(button.getText()));
                         }
                     }
                 }
             }
         }
-        // 不再需要请求窗口焦点以接收物理键盘输入
-        // requestFocusInWindow();
+        requestFocusInWindow();
     }
 
     /**
-     * Creates the panel containing the virtual keyboard buttons.
-     * Arranges buttons in rows using FlowLayout within a main GridLayout panel.
-     * Buttons are labeled and styled.
+     * Creates the virtual keyboard panel.
      *
-     * @return The JPanel for the keyboard.
+     * @post.   returns JPanel with 3 rows of letter/del/enter buttons
+     *          buttons have correct dimensions and layout
+     *
+     * @return A JPanel containing rows of JButton keys.
      */
     private JPanel createKeyboardPanel() {
         JPanel panel = new JPanel(new GridLayout(3, 1, 5, 5));
-
         String[] row1 = {"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"};
         String[] row2 = {"A", "S", "D", "F", "G", "H", "J", "K", "L"};
-        String[] row3 = {"ENTER", "Z", "X", "C", "V", "B", "N", "M", "DEL"};
-
+        String[] row3 = {"ENTER", "Z", "X", "C", "V", "B", "N", "M", "<-"};
         panel.add(createKeyboardRow(row1));
         panel.add(createKeyboardRow(row2));
         panel.add(createKeyboardRow(row3));
-
         return panel;
     }
 
     /**
      * Creates a single row of keyboard buttons.
-     * Uses FlowLayout to center buttons within the row and sets button sizes.
      *
-     * @param letters The array of strings for the buttons in this row.
-     * @return The JPanel for the keyboard row.
+     * @pre.    letters ≠ null ∧ not empty
+     * @post.   returns JPanel with FlowLayout containing buttons for each letter
+     *          buttons have correct preferred sizes
+     *
+     * @param letters Array of strings representing keys in this row.
+     * @return A JPanel representing one row of the keyboard.
      */
     private JPanel createKeyboardRow(String[] letters) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.CENTER, 3, 3));
         for (String letter : letters) {
             JButton button = new JButton(letter);
-            if (letter.length() == 1) {
+            if (letter.length() == 1 || letter.equals("<-")) {
                 button.setPreferredSize(new Dimension(45, 45));
             } else {
                 button.setPreferredSize(new Dimension(80, 45));
@@ -224,81 +189,60 @@ public class GUIView extends JFrame implements Observer {
     }
 
     /**
-     * Updates the game board display with the current player's path and validation results.
-     * Clears the existing display and adds new panels for each word in the path,
-     * coloring letters based on the validation results.
+     * Updates the game board with the current word path and validation results.
      *
-     * @param path    The list of words in the current game path.
-     * @param results The list of validation results for each word in the path.
+     * @pre.    path may be null or non-empty
+     *          results may be null or match path size - 1
+     * @post.   gameBoardPanel is cleared and repopulated with word panels
+     *          each word is displayed with appropriate letter colors
+     *
+     * @param path    List of words entered by the player
+     * @param results Validation results for each step
      */
     private void updateGameBoard(ArrayList<String> path, ArrayList<ValidationResult> results) {
         gameBoardPanel.removeAll();
-
-        System.out.println("DEBUG: Entering updateGameBoard.");
-        System.out.println("DEBUG: Received path: " + path);
-        System.out.println("DEBUG: Received results: " + results);
-        System.out.println("DEBUG: Path size: " + (path != null ? path.size() : 0) + ", Results size: " + (results != null ? results.size() : 0));
-
         if (path != null && !path.isEmpty()) {
             JPanel initialWordPanel = createWordPanel(path.get(0), null);
             gameBoardPanel.add(initialWordPanel);
-            System.out.println("DEBUG: Added initial word panel for: " + path.get(0));
         }
-
         for (int i = 1; i < (path != null ? path.size() : 0); i++) {
             String word = path.get(i);
-            ValidationResult result = (results != null && results.size() > i - 1) ?
-                    results.get(i - 1) : null;
-
-            if (result != null) {
-                JPanel wordPanel = createWordPanel(word, result);
-                gameBoardPanel.add(wordPanel);
-                System.out.println("DEBUG: Added word panel for: " + word + " with result.");
-            } else {
-                JPanel wordPanel = createWordPanel(word, null);
-                gameBoardPanel.add(wordPanel);
-                System.out.println("DEBUG: Added word panel for: " + word + " without result (unexpected).");
-            }
+            ValidationResult result = (results != null && results.size() > i - 1) ? results.get(i - 1) : null;
+            JPanel wordPanel = createWordPanel(word, result);
+            gameBoardPanel.add(wordPanel);
         }
-
         gameBoardPanel.revalidate();
         gameBoardPanel.repaint();
-
-        System.out.println("DEBUG: Exiting updateGameBoard.");
     }
 
     /**
-     * Creates a JPanel to display a single word, coloring letters based on ValidationResult.
-     * Each letter is a JLabel with a background color and border.
+     * Creates a visual representation of a single word with colored letters.
      *
-     * @param word   The word to display.
-     * @param result The validation result for this word.
-     * @return The JPanel displaying the word.
+     * @pre.    word ≠ null (maybe empty)
+     *          result may be null or contain valid LetterState values
+     * @post.   returns JPanel with colored labels for each character
+     *          colors correspond to CORRECT_POSITION (GREEN), WRONG_POSITION (YELLOW), NOT_IN_WORD (GRAY)
+     *
+     * @param word   The word to display
+     * @param result Validation result used to color the letters
+     * @return A JPanel containing colored letter labels
      */
     private JPanel createWordPanel(String word, ValidationResult result) {
         JPanel wordPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
         Map<Integer, LetterState> letterStates = (result != null) ? result.getLetterStates() : null;
-
         if (word == null) {
-            System.err.println("Error: createWordPanel received null word.");
             return wordPanel;
         }
-
         for (int i = 0; i < word.length(); i++) {
-            JLabel letterLabel = new JLabel(String.valueOf(word.charAt(i)));
+            char character = word.charAt(i);
+            JLabel letterLabel = new JLabel(String.valueOf(character));
             letterLabel.setPreferredSize(new Dimension(35, 35));
             letterLabel.setHorizontalAlignment(SwingConstants.CENTER);
             letterLabel.setVerticalAlignment(SwingConstants.CENTER);
             letterLabel.setOpaque(true);
             letterLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-
-            LetterState state = null;
-            if (letterStates != null && letterStates.containsKey(i)) {
-                state = letterStates.get(i);
-            }
-
-            Color bgColor = Color.WHITE;
-
+            LetterState state = (letterStates != null && letterStates.containsKey(i)) ? letterStates.get(i) : null;
+            Color bgColor;
             if (state != null) {
                 switch (state) {
                     case CORRECT_POSITION:
@@ -317,7 +261,6 @@ public class GUIView extends JFrame implements Observer {
             } else {
                 bgColor = Color.WHITE;
             }
-
             letterLabel.setBackground(bgColor);
             wordPanel.add(letterLabel);
         }
@@ -325,166 +268,165 @@ public class GUIView extends JFrame implements Observer {
     }
 
     /**
-     * Clears the game board display by removing all word panels.
-     */
-    private void clearGameBoard() {
-        gameBoardPanel.removeAll();
-        gameBoardPanel.revalidate();
-        gameBoardPanel.repaint();
-        System.out.println("DEBUG: Game board cleared.");
-    }
-
-    /**
-     * Sets the text for the message label at the bottom of the view.
+     * Sets the status message displayed at the bottom of the view.
      *
-     * @param message The message to display.
+     * @pre.    message may be null or empty (sets empty string in that case)
+     * @post.   messageLabel text is updated to the provided message
+     *
+     * @param message The message to display
      */
     public void setMessage(String message) {
         messageLabel.setText(message != null ? message : "");
-        System.out.println("DEBUG: Message set to: " + (message != null ? message : "NULL"));
     }
 
     /**
-     * Sets the text for the initial word label.
+     * Sets the text for the start word label.
      *
-     * @param word The initial word.
+     * @pre.    word may be null (sets "____" in that case)
+     * @post.   initialWordLabel text is updated to "Start Word: " + word or "____"
+     *
+     * @param word The start word
      */
     public void setInitialWord(String word) {
         initialWordLabel.setText("Start Word: " + (word != null ? word : "____"));
-        System.out.println("DEBUG: Initial word label set to: " + (word != null ? word : "NULL"));
     }
 
     /**
      * Sets the text for the target word label.
      *
-     * @param word The target word.
+     * @pre.    word may be null (sets "____" in that case)
+     * @post.   targetWordLabel text is updated to "Target Word: " + word or "____"
+     *
+     * @param word The target word
      */
     public void setTargetWord(String word) {
         targetWordLabel.setText("Target Word: " + (word != null ? word : "____"));
-        System.out.println("DEBUG: Target word label set to: " + (word != null ? word : "NULL"));
     }
 
     /**
      * Enables or disables the reset button.
      *
-     * @param enabled True to enable, false to disable.
+     * @pre.    enabled is either true or false
+     * @post.   resetButton's enabled state matches parameter
+     *
+     * @param enabled True to enable, false to disable
      */
     public void setResetButtonEnabled(boolean enabled) {
         resetButton.setEnabled(enabled);
-        System.out.println("DEBUG: Reset button enabled: " + enabled);
     }
 
     /**
-     * Updates the display area showing the current word being typed by the player.
-     * @param currentInput The current string of characters typed.
+     * Updates the display showing the current word being typed by the player.
+     *
+     * @pre.    currentInput may be null (sets empty string in that case)
+     * @post.   currentInputDisplayLabel text is updated to "Current Input: " + currentInput
+     *
+     * @param currentInput The current string of characters typed
      */
     public void updateInputDisplay(String currentInput) {
         currentInputDisplayLabel.setText("Current Input: " + (currentInput != null ? currentInput : ""));
     }
 
-
-    // --- Getters and Setters for Checkbox States (Used by Controller) ---
-
-    public boolean isShowErrorsSelected() {
-        return showErrorsCheckBox.isSelected();
+    /**
+     * Sets whether the 'Show Solution Path' checkbox is selected.
+     *
+     * @pre.    selected is either true or false
+     * @post.   showPathCheckBox's selected state matches parameter
+     *
+     * @param selected True to select, false to deselect
+     */
+    public void setShowPathSelected(boolean selected) {
+        showPathCheckBox.setSelected(selected);
     }
-
-    public void setShowErrorsSelected(boolean selected) {
-        showErrorsCheckBox.setSelected(selected);
-        System.out.println("DEBUG: Show Errors checkbox set to: " + selected);
-    }
-
-    public boolean isRandomWordSelected() {
-        return randomWordCheckBox.isSelected();
-    }
-
-    public void setRandomWordSelected(boolean selected) {
-        randomWordCheckBox.setSelected(selected);
-        System.out.println("DEBUG: Random Words checkbox set to: " + selected);
-    }
-
 
     /**
-     * This method is called when the observed Model changes.
-     * It updates the GUI display based on the state received from the Model.
-     * The state is expected to be wrapped in a Notification object.
+     * Called when the observed model changes.
+     * Updates the GUI based on the new game state.
      *
-     * @param o   The observable object (WeaverModel).
-     * @param arg An argument passed by the notifyObservers method (should be Notification).
+     * @pre.    o is a WeaverModel instance ∧ arg is a Notification
+     * @post.   UI components are updated based on game state in notification
+     *          virtual keyboard and physical keyboard are enabled/disabled based on win status
+     *
+     * @param o   The observable object (WeaverModel)
+     * @param arg An argument passed by notifyObservers (should be Notification)
      */
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println("DEBUG: Inside GUIView update method. Arg type: " + (arg != null ? arg.getClass().getName() : "null"));
         if (arg instanceof Notification) {
             Notification notification = (Notification) arg;
-            System.out.println("DEBUG: Arg is a Notification.");
-
-            // Update messages first
             setMessage(notification.getRuntimeWarning() != null ? notification.getRuntimeWarning() : notification.getHint());
-
             if (notification.containsGameState()) {
                 GameState gameState = notification.getGameState();
-                System.out.println("DEBUG: Notification contains GameState.");
-                System.out.println("DEBUG: GameState Initial: " + gameState.getInitialWord() + ", Target: " + gameState.getTargetWord());
-                System.out.println("DEBUG: GameState Path size: " + (gameState.getPath() != null ? gameState.getPath().size() : 0) + ", Results size: " + (gameState.getResults() != null ? gameState.getResults().size() : 0) + ", Won: " + gameState.isWon());
-
-                // Update initial and target word labels
                 setInitialWord(gameState.getInitialWord());
                 setTargetWord(gameState.getTargetWord());
-
-                // Update the game board display
                 updateGameBoard(gameState.getPath(), gameState.getResults());
-
-                // Enable reset button after the first player input
                 setResetButtonEnabled(gameState.getPath() != null && gameState.getPath().size() > 1);
-
-                // **Control virtual keyboard enabled state based on game won state**
                 if (gameState.isWon()) {
-                    System.out.println("DEBUG: GameState indicates won. Disabling keyboard.");
-                    setKeyboardEnabled(false); // Disable keyboard if game is won
+                    if (this.controller != null) {
+                        this.controller.setPhysicalKeyboardProcessingEnabled(false);
+                    }
+                    setVirtualKeyboardEnabled(false);
                 } else {
-                    System.out.println("DEBUG: GameState indicates ongoing or reset. Enabling keyboard.");
-                    setKeyboardEnabled(true); // Enable keyboard if game is not won
+                    if (this.controller != null) {
+                        this.controller.setPhysicalKeyboardProcessingEnabled(true);
+                    }
+                    setVirtualKeyboardEnabled(true);
                 }
-
             } else {
-                System.out.println("DEBUG: Notification does not contain GameState.");
-                // Handle notifications that are just messages
+                System.err.println("Notification does not contain GameState.");
             }
         } else {
-            System.out.println("DEBUG: Update received unexpected argument type: " + (arg != null ? arg.getClass().getName() : "null"));
+            System.err.println("Update received unexpected argument type: " + (arg != null ? arg.getClass().getName() : "null"));
         }
+        requestFocusInWindow();
     }
 
     /**
      * Enables or disables the virtual keyboard buttons.
-     * This method iterates through the keyboard panel components and sets their enabled state.
      *
-     * @param enabled True to enable, false to disable.
+     * @pre.    enabled is either true or false
+     * @post.   all buttons in keyboardPanel are enabled/disabled accordingly
+     *
+     * @param enabled True to enable, false to disable
      */
-    private void setKeyboardEnabled(boolean enabled) {
-        System.out.println("DEBUG: Attempting to set virtual keyboard enabled state to: " + enabled); // Debug print
-
+    private void setVirtualKeyboardEnabled(boolean enabled) {
         if (keyboardPanel != null) {
-            // Iterate through all components in the keyboard panel
-            // The keyboard panel is a GridLayout of JPanels (rows)
             for (Component panelComponent : keyboardPanel.getComponents()) {
-                // Check if the component is a JPanel (representing a row)
                 if (panelComponent instanceof JPanel) {
                     JPanel rowPanel = (JPanel) panelComponent;
-                    // Iterate through buttons in each row panel
                     for (Component buttonComponent : rowPanel.getComponents()) {
-                        // Check if the component is a JButton (a keyboard key)
                         if (buttonComponent instanceof JButton) {
                             JButton button = (JButton) buttonComponent;
-                            button.setEnabled(enabled); // **Set the enabled state of the button**
+                            button.setEnabled(enabled);
                         }
                     }
                 }
             }
-            System.out.println("DEBUG: Virtual keyboard enabled state set to: " + enabled); // Confirm state was set
         } else {
-            System.err.println("Error: keyboardPanel is null in setKeyboardEnabled."); // Handle null panel case
+            System.err.println("Error: keyboardPanel is null in setVirtualKeyboardEnabled.");
         }
+    }
+
+    /**
+     * Gets the solution path window reference.
+     *
+     * @post.   returns current pathSolutionWindow (may be null)
+     *
+     * @return The PathSolutionView window
+     */
+    public PathSolutionView getPathSolutionWindow() {
+        return pathSolutionWindow;
+    }
+
+    /**
+     * Sets the solution path window reference.
+     *
+     * @pre.    pathSolutionWindow may be null (closes window) or valid instance
+     * @post.   this.pathSolutionWindow == pathSolutionWindow
+     *
+     * @param pathSolutionWindow The new PathSolutionView window
+     */
+    public void setPathSolutionWindow(PathSolutionView pathSolutionWindow) {
+        this.pathSolutionWindow = pathSolutionWindow;
     }
 }

@@ -1,8 +1,23 @@
 import java.util.*;
 
+/**
+ * A utility class for finding word transformation paths and validating them.
+ * Provides methods to:
+ * - Find a path from an initial word to a target word using BFS
+ * - Generate validation results for each step in the path
+ */
 public class PathFinder {
-    public static ArrayList<String> findPathByBFS(String initial, String target, ArrayList<String> dictionary) {
 
+    /**
+     * Finds the shortest transformation path from the initial word to the target word,
+     * using Breadth-First Search (BFS) over the dictionary of valid words.
+     *
+     * @param initial   The starting word
+     * @param target    The target word to reach
+     * @param dictionary A list of valid words that can be used in transformations
+     * @return An ArrayList containing the sequence of words from initial to target, or an empty list if no path exists
+     */
+    public static ArrayList<String> findPathByBFS(String initial, String target, ArrayList<String> dictionary) {
         Set<String> dictSet = new HashSet<>(dictionary);
         if (!dictSet.contains(target)) {
             return new ArrayList<>();
@@ -53,26 +68,31 @@ public class PathFinder {
         return new ArrayList<>();
     }
 
+    /**
+     * Generates validation results for each word in the path.
+     * Uses a WordValidator to validate each step against the target word.
+     *
+     * @param target    The final target word
+     * @param path      The sequence of words leading to the target
+     * @param dictionary The dictionary of valid words
+     * @return An ArrayList of ValidationResult objects corresponding to each step in the path
+     */
     public static ArrayList<ValidationResult> getValidations(String target, ArrayList<String> path, ArrayList<String> dictionary) {
         ArrayList<ValidationResult> validationResults = new ArrayList<>();
-        // 如果路径为 null 或空，或者只包含起始词 (长度 <= 1)，则没有需要验证的步骤
         if (path == null || path.size() <= 1) {
-            return validationResults; // 返回一个空列表
+            return validationResults;
         }
 
-        // **在 PathFinder 内部创建一个 BasicValidator 实例用于路径步骤的验证显示**
-        WordValidator pathStepValidator = new BasicValidator(); // **确保 BasicValidator 可以被正确实例化**
+        WordValidator pathStepValidator = new BasicValidator();
 
-        // 从路径的第二个词开始 (索引 1) 遍历，计算每个词的验证结果
+
         for (int i = 1; i < path.size(); i++) {
-            String currentWord = path.get(i); // 获取当前路径中的单词
-            // 使用内部创建的 BasicValidator 验证当前词是否符合目标词的规则
-            // **确保 BasicValidator.validate(inputWord, targetWord, dictionary) 的参数顺序正确**
-            // 在这里，currentWord 是本次验证的“输入词”，target 是最终的“目标词”
+            String currentWord = path.get(i);
+
             ValidationResult result = pathStepValidator.validate(currentWord, target, dictionary); // **使用内部 Validator 进行验证**
-            validationResults.add(result); // 将验证结果添加到列表中
+            validationResults.add(result);
         }
-        return validationResults; // 返回验证结果列表
+        return validationResults;
     }
 
 }
