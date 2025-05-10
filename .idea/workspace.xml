@@ -4,31 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f4f2814c-7556-48ba-b8c2-d87c79fc23b1" name="Changes" comment="complete CLI">
+    <list default="true" id="f4f2814c-7556-48ba-b8c2-d87c79fc23b1" name="Changes" comment="complete all functions">
+      <change afterPath="$PROJECT_DIR$/lib/hamcrest-core-1.3.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/junit-4.13.1.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/WeaverModelTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/AbstractValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/AbstractValidator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/BasicValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BasicValidator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CLIMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CLIMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/FixedStrategyFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FixedStrategyFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/FixedWordStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FixedWordStrategy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GUIController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUIController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GUIMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUIMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GUIView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GUIView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GameState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GameState.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Notification.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PathFinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PathFinder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/PathSolutionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/PathSolutionView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RandomStrategyFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RandomStrategyFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/RandomWordStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RandomWordStrategy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/StrategyFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/StrategyFactory.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ValidationResult.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ValidationResult.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ValidatorDecorator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ValidatorDecorator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/WeaverModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WeaverModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/WithPath.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WithPath.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/WithWarning.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WithWarning.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/WordGenerationStrategy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WordGenerationStrategy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/WordGenerationStrategyDecorator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WordGenerationStrategyDecorator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/WordValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WordValidator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WeaverGame.iml" beforeDir="false" afterPath="$PROJECT_DIR$/WeaverGame.iml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +23,7 @@
         <option value="Interface" />
         <option value="Enum" />
         <option value="Class" />
+        <option value="JUnit4 Test Class" />
       </list>
     </option>
   </component>
@@ -54,36 +37,52 @@
   &quot;associatedIndex&quot;: 8
 }</component>
   <component name="ProjectId" id="2v7zBzUMjlQBZnct5lzsExabiWw" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.CLIMain.executor&quot;: &quot;Run&quot;,
-    &quot;Application.GUIMain.executor&quot;: &quot;Run&quot;,
-    &quot;Application.PathSolutionView.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Application.CLIMain.executor": "Run",
+    "Application.GUIMain.executor": "Run",
+    "Application.PathSolutionView.executor": "Run",
+    "Downloaded.Files.Path.Enabled": "true",
+    "JUnit.WeaverModelTest.executor": "Run",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary": "JUnit4",
+    "com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4": "",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Hou\CDUT\OBU\AOOP\code\WeaverGame\src\resources" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="" />
     </key>
   </component>
   <component name="SharedIndexes">
@@ -121,7 +120,7 @@
       <workItem from="1746698351151" duration="20126000" />
       <workItem from="1746753934947" duration="7169000" />
       <workItem from="1746789568669" duration="10230000" />
-      <workItem from="1746837627658" duration="24181000" />
+      <workItem from="1746837627658" duration="28273000" />
     </task>
     <task id="LOCAL-00001" summary="initial code">
       <option name="closed" value="true" />
@@ -219,7 +218,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746804480331</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="complete all functions">
+      <option name="closed" value="true" />
+      <created>1746891156186</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1746891156186</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -243,6 +250,7 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="initial code" />
     <MESSAGE value="real initial code" />
     <MESSAGE value="add strategy factory" />
@@ -255,7 +263,8 @@
     <MESSAGE value="update GUI view and path" />
     <MESSAGE value="complete GUI" />
     <MESSAGE value="complete CLI" />
-    <option name="LAST_COMMIT_MESSAGE" value="complete CLI" />
+    <MESSAGE value="complete all functions" />
+    <option name="LAST_COMMIT_MESSAGE" value="complete all functions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
