@@ -89,7 +89,7 @@ public class PathFinder {
         for (int i = 1; i < path.size(); i++) {
             String currentWord = path.get(i);
 
-            ValidationResult result = pathStepValidator.validate(currentWord, target, dictionary); // **使用内部 Validator 进行验证**
+            ValidationResult result = pathStepValidator.validate(currentWord, target, dictionary);
             validationResults.add(result);
         }
         return validationResults;
